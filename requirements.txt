@@ -1,0 +1,9 @@
+# Core packages needed to run the project
+
+torch
+torchvision
+torchaudio
+
+numpy
+matplotlib
+tqdm

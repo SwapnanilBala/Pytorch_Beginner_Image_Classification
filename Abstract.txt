@@ -1,0 +1,65 @@
+Project Abstract — CIFAR-10 Image Classification with PyTorch
+
+Goal
+Train a neural network to classify small color images into one of 10 categories using PyTorch.
+Each image belongs to exactly one class (airplane, automobile, bird, cat, deer, dog, frog, horse, ship, truck).
+
+Dataset (CIFAR-10)
+CIFAR-10 contains 60,000 RGB images of size 32×32 pixels.
+It comes pre-split into:
+- Training set: 50,000 images (used to learn)
+- Test set:     10,000 images (held out for evaluation)
+The code does not create the split manually; it uses the dataset’s standard split.
+
+How the Computer “Sees” an Image is stored as numbers:
+- Shape: (3, 32, 32) where 3 channels are Red/Green/Blue
+- Pixel values are converted to tensors and normalized (standardized) so training is more stable.
+
+Model Idea (SmallCNN)
+We use a small Convolutional Neural Network (CNN) because CNNs are designed to learn patterns in images.
+The CNN learns features in stages:
+1) Early layers detect simple patterns (edges, corners)
+2) Middle layers combine them into textures/shapes
+3) Later layers combine shapes into class-specific signals
+
+Key operations:
+- Convolution (Conv2d): learns filters that detect patterns in the image.
+- ReLU: adds non-linearity so the model can learn complex decision boundaries.
+- MaxPooling: downsamples spatial size (32→16→8→4). This reduces computation and helps form higher-level, more robust features.
+- Flatten + Linear layers: convert learned feature maps into class scores (logits) for 10 classes.
+
+Training Process (What “Epochs” Mean)
+Training happens in epochs:
+- 1 epoch = one full pass over all 50,000 training images.
+- We train for 5 epochs (5 full passes).
+
+We train using mini-batches (e.g., 128 images at a time):
+For each batch:
+1) Forward pass: model produces logits (scores) for each class
+2) Loss computation: CrossEntropyLoss measures how wrong the prediction is
+3) Backward pass: compute gradients via backpropagation (loss.backward())
+4) Optimizer step: Adam updates model weights to reduce the loss (opt.step())
+
+Evaluation
+After each epoch, we evaluate on the 10,000 test images:
+- We switch to eval mode (model.eval()) to disable training-only behaviors like dropout.
+- We disable gradient tracking (torch.no_grad()) for speed and memory.
+We report:
+- Test loss (how wrong/confident the model is)
+- Test accuracy (fraction of test images classified correctly)
+
+Outputs
+- Console logs: epoch-by-epoch train loss/accuracy and test loss/accuracy
+- Best checkpoint: checkpoints/best.pt (saved when test accuracy improves)
+- Visuals:
+  - Optional image grid preview of training images (to understand the data)
+  - Training curves (loss and accuracy over epochs)
+
+GPU Usage
+If a CUDA-capable GPU is available, the model and batches are moved to GPU automatically:
+device = "cuda" if torch.cuda.is_available() else "cpu"
+This significantly speeds up training.
+
+In short
+This project demonstrates the full deep learning workflow:
+load data → define CNN → train with backprop → evaluate on held-out test set → visualize results → save best model.
